@@ -222,6 +222,8 @@ class _HomePageState extends State<HomePage> {
 
     }
 
+
+    /// get month wise amount
     for (String eachUniqueMonth in arrUniqueMonths) {
       List<ExpenseModel> eachMonthExpenses = [];
       num eachMonthAmt = 0;
