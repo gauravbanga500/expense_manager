@@ -2,6 +2,7 @@ import 'package:expenser_app/app_widgets/app_rounded_button.dart';
 import 'package:expenser_app/bloc/expense_bloc.dart';
 import 'package:expenser_app/bloc/expense_event.dart';
 import 'package:expenser_app/models/expense_model.dart';
+import 'package:expenser_app/shared_preferences/user_preference.dart';
 import 'package:expenser_app/utils/my_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -99,10 +100,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               });
             }),
             hSpacer(),
-            AppRoundedButton(onTap: (){
+            AppRoundedButton(onTap: () async{
 
               context.read<ExpenseBloc>().add(AddExpenseEvent(newExpense: ExpenseModel(
-                  user_id: 1,
+                  user_id: await UserPreferences().getUID(),
                   expense_title: titleController.text.toString(),
                   expense_desc: descController.text.toString(),
                   expense_amount: double.parse(amountController.text.toString()),

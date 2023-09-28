@@ -14,7 +14,6 @@ class CreateNewUserEvent extends UserEvent {
 
 class LoginUserEvent extends UserEvent{
   String uName, pass;
-
   LoginUserEvent({required this.uName, required this.pass});
 
 }

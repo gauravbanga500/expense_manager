@@ -3,9 +3,14 @@ import 'package:expenser_app/color_constant.dart';
 import 'package:expenser_app/main.dart';
 import 'package:expenser_app/models/theme_modal.dart';
 import 'package:expenser_app/models/user_model.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_bloc.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_event.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_state.dart';
+import 'package:expenser_app/user_onboarding/login_page.dart';
 import 'package:expenser_app/utils/my_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:expenser_app/database/app_database.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 
@@ -122,45 +127,63 @@ class _SignUpState extends State<SignUp> {
                       mHeight: 20
                   ),
 
-                  AppRoundedButton(onTap: () async {
-                    var name = nameController.text.toString();
-                    var email = emailController.text.toString();
-                    var mobile = mobController.text.toString();
-                    var password = passController.text.toString();
-                    var password2 = passController2.text.toString();
-                    var age = ageController.text.toString();
+                  BlocConsumer<UserBloc, UserState>(
+                   listener: (context, state){
+                     if(state is UserSuccessState){
+                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Account Successfully Created")));
+                       Navigator.pop(context);
+                     } else if(state is UserErrorState){
+                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${state.ErrorMsg}")));
+                     }
+                   },
+                    builder: (context, state){
+                     return  AppRoundedButton(onTap: () async {
+                       var name = nameController.text.toString();
+                       var email = emailController.text.toString();
+                       var mobile = mobController.text.toString();
+                       var password = passController.text.toString();
+                       var password2 = passController2.text.toString();
+                       var age = ageController.text.toString();
 
 
-                    if(_formfield.currentState!.validate()){
-                      print("Validate Successfully");
-                      if(await db.checkIfEmailAlreadyExist(UserModel(email: email)) ){
-                        print("You Already Have An Account");
-                      }
-                      else if(password == password2 ){
-                        print("Good Both Password Are Matched");
-                        await db.CreateNewAccount(UserModel(email: email, mob: mobile, name: name, password: password, age: age));
-                        print("Account Created");
-                      }
-                      else if(password != password2){
-                        showDialog(context: context, builder: (ctx) =>  AlertDialog(
-                          content: Text("Please Check Both The Password"),
-                          actions:<Widget>[
-                            TextButton(onPressed: (){
-                              Navigator.pop(context);
-                            }, child: Text("Close"))
-                          ],
-                        ));
-                      }
+                       if(_formfield.currentState!.validate()){
+                         print("Validate Successfully");
+                         if(await db.checkIfEmailAlreadyExist(UserModel(email: email)) ){
+                           print("You Already Have An Account");
+                         }
+                         else if(password == password2 ){
+                           print("Good Both Password Are Matched");
+                           await db.CreateNewAccount(UserModel(email: email, mob: mobile, name: name, password: password, age: age));
+                           print("Account Created");
+                         }
+                         else if(password != password2){
+                           showDialog(context: context, builder: (ctx) =>  AlertDialog(
+                             content: Text("Please Check Both The Password"),
+                             actions:<Widget>[
+                               TextButton(onPressed: (){
+                                 Navigator.pop(context);
+                               }, child: Text("Close"))
+                             ],
+                           ));
+                         }
 
-                      emailController.clear();
-                      passController.clear();
+                         emailController.clear();
+                         passController.clear();
+                       }
+
+                       context.read<UserBloc>().add(CreateNewUserEvent(user: UserModel(
+                           email: email,
+                           name: name,
+                           mob: mobile,
+                           age: age,
+                           password: password )));
+
+                     },title: "Sign Up");
                     }
-
-
-
-
-
-                  },title: "Sign Up")
+                  ),
+                  ElevatedButton(onPressed: (){
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder:(context) => LoginPage(),));
+                  }, child: Text("Login Now"))
                 ],
               ),
             ),

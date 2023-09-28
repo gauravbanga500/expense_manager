@@ -3,18 +3,22 @@ import 'package:expenser_app/database/app_database.dart';
 import 'package:expenser_app/models/theme_modal.dart';
 import 'package:expenser_app/provider/app_theme_provider.dart';
 import 'package:expenser_app/screens/home_page.dart';
+import 'package:expenser_app/screens/splash/splash_page.dart';
 import 'package:expenser_app/screens/transactions/add_transaction_page.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_bloc.dart';
 import 'package:expenser_app/user_onboarding/login_page.dart';
 import 'package:expenser_app/user_onboarding/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart';
 
 import 'package:provider/provider.dart';
 
 void main() {
   runApp( MultiProvider(providers: [
       ChangeNotifierProvider(create: (context)=> ThemeModal()),
-      BlocProvider(create: (context)=> ExpenseBloc(db: AppDataBase.db))
+      BlocProvider(create: (context)=> ExpenseBloc(db: AppDataBase.db)),
+      BlocProvider(create: (context)=> UserBloc(db: AppDataBase.db)),
   ],
 
       child: const MyApp(),

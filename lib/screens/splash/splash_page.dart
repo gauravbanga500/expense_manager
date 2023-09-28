@@ -1,3 +1,8 @@
+import 'dart:async';
+
+import 'package:expenser_app/screens/home_page.dart';
+import 'package:expenser_app/shared_preferences/user_preference.dart';
+import 'package:expenser_app/user_onboarding/login_page.dart';
 import 'package:expenser_app/utils/image_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:expenser_app/utils/my_styles.dart';
@@ -12,6 +17,23 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    Timer(Duration(seconds: 2), () async{
+      int uid = await UserPreferences().getUID();
+       Widget nextPage;
+       if(uid>0){
+         nextPage = HomePage();
+       } else{
+         nextPage = LoginPage();
+       }
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => nextPage,));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
   var mediaQueryData = MediaQuery.of(context);

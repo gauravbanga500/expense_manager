@@ -3,9 +3,14 @@ import 'package:expenser_app/color_constant.dart';
 import 'package:expenser_app/database/app_database.dart';
 import 'package:expenser_app/models/user_model.dart';
 import 'package:expenser_app/screens/home_page.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_bloc.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_event.dart';
+import 'package:expenser_app/user_onboarding/bloc/user_state.dart';
+import 'package:expenser_app/user_onboarding/sign_up_page.dart';
 import 'package:expenser_app/utils/my_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../utils/image_constants.dart';
 
@@ -80,23 +85,44 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
-        AppRoundedButton(onTap: () async{
-            var email = emailController.text.toString();
-            var password = passwordController.text.toString();
-
-            if(email == ""){
-              print("Please Enter Your Email");
-            } else if(password == ""){
-              print("Please Enter Your Password");
-            } else {
-              if(await db.authenticateUser(email, password)){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
-              } else{
-                print("Account Doesn't Exist");
-              }
+        BlocConsumer<UserBloc,UserState>(
+          listener: (context, state){
+            if(state is UserSuccessState){
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("User Successfully Logged In")));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
+            } else if(state is UserErrorState){
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${state.ErrorMsg}")));
             }
+          },
+          builder: (context, state){
+            if(state is UserLoadingState){
+              return Center(child: CircularProgressIndicator(),);
+            }
+            return AppRoundedButton(onTap: () async{
+              var email = emailController.text.toString();
+              var password = passwordController.text.toString();
 
-        }, title: "Login", textColor: Colors.white,)
+              if(email == ""){
+                print("Please Enter Your Email");
+              } else if(password == ""){
+                print("Please Enter Your Password");
+              } else {
+                if(await db.authenticateUser(email, password)){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
+                } else{
+                  print("Account Doesn't Exist");
+                }
+              }
+              context.read<UserBloc>().add(LoginUserEvent(uName: email, pass: password));
+
+            }, title: "Login", textColor: Colors.white,);
+          },
+        ),
+        InkWell(
+        onTap: (){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignUp(),));
+    },
+    child: Text("Didn't Have An Account Create Now", style: mTextStyle16(),),)
 
       ],
     ) : SingleChildScrollView(

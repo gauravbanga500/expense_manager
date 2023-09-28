@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:expenser_app/models/expense_model.dart';
+import 'package:expenser_app/shared_preferences/user_preference.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,8 +109,7 @@ class AppDataBase{
        var data = await db.query(USER_TABLE, where: "$USER_EMAIL = ? and  $USER_PASSWORD = ?", whereArgs: [email, password] );
 
        if(data.isNotEmpty){
-         var pref = await SharedPreferences.getInstance();
-         pref.setInt("uid", data[0][USER_ID] as int);
+         UserPreferences().setUID(data[0][USER_ID] as int);
        }
 
 
@@ -130,7 +130,8 @@ class AppDataBase{
 
       Future<List<ExpenseModel>> getAllExpenseOfUser() async {
       var db = await getDB();
-      int uid = 1;
+
+      int uid = await UserPreferences().getUID();
 
 
       List<Map<String, dynamic>> data = await db.query(EXPENSE_TABLE, where: "$USER_ID = ? ", whereArgs: ["$uid"]);

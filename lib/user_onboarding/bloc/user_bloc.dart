@@ -4,8 +4,8 @@ import 'package:expenser_app/user_onboarding/bloc/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  var db = AppDataBase.db;
-  UserBloc(): super(UserInitialState()){
+   AppDataBase db;
+  UserBloc({required this.db}): super(UserInitialState()){
 
     on<CreateNewUserEvent>((event, emit) async {
      emit(UserLoadingState());
